@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import static com.stuible.lyrist.Constants.DATABASE_NAME;
+
 public class MyDatabase {
     private SQLiteDatabase db;
     private Context context;
@@ -26,8 +28,9 @@ public class MyDatabase {
         return id;
     }
 
-        public Cursor getLyrics()
+    public Cursor getLyrics()
     {
+//        context.deleteDatabase(DATABASE_NAME);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         String[] columns = {Constants.UID, Constants.TITLE, Constants.LYRICS};

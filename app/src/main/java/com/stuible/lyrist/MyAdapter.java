@@ -2,6 +2,7 @@ package com.stuible.lyrist;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,15 +25,31 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(row,parent,false);
-        MyViewHolder viewHolder = new MyViewHolder(v);
-        return viewHolder;
+//        LayoutInflater inflater = LayoutInflater.from(context);
+//        View v = inflater.inflate(row,parent,false);
+////        View v = LayoutInflater.from(parent.getContext()).inflate(row,parent,false);
+//        MyViewHolder viewHolder = new MyViewHolder(v);
+//        Log.d("View Holder", "Created view holder");
+//        return viewHolder;
+
+//        View v = LayoutInflater.from(parent.getContext()).inflate(row,parent,false);
+//        MyViewHolder viewHolder = new MyViewHolder(v);
+//        Log.d("View Holder", "Created view holder");
+//        return viewHolder;
+
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(row, parent, false);
+        Log.d("View Holder", "Created view holder");
+        return new MyViewHolder(itemView);
+
     }
 
     @Override
     public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
 
+        Log.d("onBindViewHolder Position", (String.valueOf(position)));
         String[]  results = (list.get(position).toString()).split(",");
+        Log.d("Item to List:", results[0] + ": " + results[1]);
         holder.lyricTitleTextView.setText(results[0]);
         holder.summeryTextView.setText(results[1]);
     }
