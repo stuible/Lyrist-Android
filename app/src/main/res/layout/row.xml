@@ -3,7 +3,12 @@
     android:id="@+id/listLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/lyric_card"
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,25 +21,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/hind_light"
             android:gravity="left"
             android:text="New Text"
             android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/lyricTags"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="New Text" />
+        <!--<TextView-->
+        <!--android:id="@+id/lyricTags"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="right"-->
+        <!--android:text="New Text" />-->
     </LinearLayout>
 
     <TextView
         android:id="@+id/lyricSummery"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1
         "
-        android:gravity="right"
-        android:text="New Text" />
+        android:fontFamily="@font/hind_medium"
+        android:gravity="left"
+        android:text="New Text"
+        android:textAlignment="gravity" />
 </LinearLayout>

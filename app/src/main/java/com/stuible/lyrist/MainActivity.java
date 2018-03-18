@@ -2,11 +2,11 @@ package com.stuible.lyrist;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -45,34 +46,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        db = new MyDatabase(this);
-        helper = new MyHelper(this);
 
-        Cursor cursor = db.getLyrics();
 
-        int index1 = cursor.getColumnIndex(Constants.TITLE);
-        int index2 = cursor.getColumnIndex(Constants.LYRICS);
-
-        ArrayList<String> mArrayList = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            String lyricTitle = cursor.getString(index1);
-            String lyrics = cursor.getString(index2);
-            String s = lyricTitle +"," + lyrics;
-            mArrayList.add(s);
-            Log.d("Found Item In Database", s);
-            cursor.moveToNext();
-        }
-
-        myAdapter = new MyAdapter(mArrayList);
-        mRecyclerView = findViewById(R.id.LyricsRecyclerView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(myAdapter);
-
-//        Toast.makeText(this, myAdapter.getItemCount(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -82,13 +57,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
-//    @Override
-//    protected void onResume() {
-//
-//        super.onResume();
-//
-//
-//    }
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        db = new MyDatabase(this);
+        helper = new MyHelper(this);
+
+        new loadLyrics().execute();
+
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -111,5 +90,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         TextView titleTextView = (TextView) view.findViewById(R.id.lyricTitle);
         TextView summeryTextView = (TextView) view.findViewById(R.id.lyricSummery);
         Toast.makeText(this, "row " + (1+position) + ":  " + titleTextView.getText() + " " + summeryTextView.getText(), Toast.LENGTH_LONG).show();
+    }
+
+    private class loadLyrics extends AsyncTask<URL, Integer, ArrayList<String>> {
+        protected ArrayList<String> doInBackground(URL... urls) {
+            Cursor cursor = db.getLyrics();
+
+            int index1 = cursor.getColumnIndex(Constants.TITLE);
+            int index2 = cursor.getColumnIndex(Constants.LYRICS);
+
+            ArrayList<String> mArrayList = new ArrayList<>();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String lyricTitle = cursor.getString(index1);
+                String lyrics = cursor.getString(index2);
+                String s = lyricTitle +"," + lyrics;
+                mArrayList.add(s);
+                Log.d("Found Item In Database", s);
+                cursor.moveToNext();
+            }
+
+            return mArrayList;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+        }
+
+        protected void onPostExecute(ArrayList<String> result) {
+            myAdapter = new MyAdapter(result);
+            mRecyclerView = findViewById(R.id.LyricsRecyclerView);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+//        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            mRecyclerView.setAdapter(myAdapter);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.stuible.lyrist;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -38,6 +39,9 @@ public class AddTextLyrics extends AppCompatActivity {
         }
         TitleEditText.setText("");
         lyricsEditText.setText("");
+
+        Intent myIntent = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(myIntent);
 
     }
 }

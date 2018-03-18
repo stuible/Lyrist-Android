@@ -16,8 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Title" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/lyricsEditText"
@@ -31,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="addLyricEntry"
-            android:text="Button"
+            android:text="Save"
             tools:layout_editor_absoluteY="511dp" />
 
     </LinearLayout>
