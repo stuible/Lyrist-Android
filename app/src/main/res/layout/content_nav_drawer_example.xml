@@ -5,12 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.stuible.lyrist.MainActivity"
-    tools:showIn="@layout/activity_main">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/LyricsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    tools:context="com.stuible.lyrist.NavDrawerExample"
+    tools:showIn="@layout/app_bar_nav_drawer_example">
 
 </android.support.constraint.ConstraintLayout>

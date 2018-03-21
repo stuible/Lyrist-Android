@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all_lyrics"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="All Lyrics" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Text Lyrics" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Photo Lyrics" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Audio Lyrics" />
+    </group>
+
+    <item android:title="Create New">
+        <menu>
+            <item
+                android:id="@+id/nav_text_lyric"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="Text Lyric" />
+            <item
+                android:id="@+id/nav_photo_lyric"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="Photo Lyric" />
+            <item
+                android:id="@+id/nav_audio_lyric"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="Audio Lyric" />
+        </menu>
+    </item>
+
+</menu>

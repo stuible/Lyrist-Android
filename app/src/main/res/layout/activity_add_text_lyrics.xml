@@ -15,20 +15,24 @@
             android:id="@+id/TitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName" />
+            android:ems="10"/>
 
         <EditText
             android:id="@+id/lyricsEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="2"
             android:ems="10"
             android:inputType="textMultiLine" />
 
         <Button
             android:id="@+id/button"
-            android:layout_width="match_parent"
+            style="@android:style/Widget.DeviceDefault.Light.Button"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"
+            android:gravity="center_horizontal|center"
             android:onClick="addLyricEntry"
             android:text="Save"
             tools:layout_editor_absoluteY="511dp" />
