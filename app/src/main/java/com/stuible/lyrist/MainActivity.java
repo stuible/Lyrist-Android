@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -127,8 +128,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (id == R.id.nav_all_lyrics) {
             // Handle the camera action
         } else if (id == R.id.nav_text_lyric) {
+            Intent myIntent = new Intent(getBaseContext(), AddTextLyrics.class);
+            startActivity(myIntent);
 
         } else if (id == R.id.nav_photo_lyric) {
+            Toast.makeText(this,
+                    "You have clicked " + "Create Photo Lyric",
+                    Toast.LENGTH_SHORT).show();
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, 1);
+            }
 
         } else if (id == R.id.nav_audio_lyric) {
 

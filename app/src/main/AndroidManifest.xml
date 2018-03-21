@@ -20,10 +20,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddTextLyrics" />
+        <!--<activity-->
+            <!--android:name=".NavDrawerExampleTODELETE"-->
+            <!--android:label="@string/title_activity_nav_drawer_example"-->
+            <!--android:theme="@style/AppTheme.NoActionBar" />-->
         <activity
-            android:name=".NavDrawerExample"
-            android:label="@string/title_activity_nav_drawer_example"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
+
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
 
 </manifest>

@@ -29,8 +29,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
-            menu.add("Share");
-            menu.add("Delete");
+            menu.add(0, 0, 0, "Share");
+            menu.add(0, 1, 0, "Delete");
+//            menu.add("Share");
+//            menu.add("Delete");
             return true;
         }
 
@@ -41,9 +43,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (Integer intItem : selectedItems) {
-                list.remove(intItem);
+
+            if(item.getItemId() == 0){
+
+                Log.d("Clicked", "Share");
+
             }
+            else if(item.getItemId() == 1){
+                Log.d("Clicked", "Delete");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (list.get(intItem).toString()).split(",");
+                    Log.d("Item to delete", results[0]);
+                    list.remove(intItem);
+                }
+            }
+
             mode.finish();
             return true;
         }
