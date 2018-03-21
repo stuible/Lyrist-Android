@@ -6,19 +6,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_all_lyrics"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_all"
             android:title="All Lyrics" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
+            android:id="@+id/nav_text_lyrics"
+            android:icon="@drawable/ic_text_icon"
             android:title="Text Lyrics" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:id="@+id/nav_photo_lyrics"
+            android:icon="@drawable/ic_picture"
             android:title="Photo Lyrics" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
+            android:id="@+id/nav_audio_lyrics"
+            android:icon="@drawable/ic_sound_rec"
             android:title="Audio Lyrics" />
     </group>
 
@@ -26,7 +26,7 @@
         <menu>
             <item
                 android:id="@+id/nav_text_lyric"
-                android:icon="@drawable/ic_menu_camera"
+                android:icon="@drawable/ic_text_input"
                 android:title="Text Lyric" />
             <item
                 android:id="@+id/nav_photo_lyric"
@@ -34,7 +34,7 @@
                 android:title="Photo Lyric" />
             <item
                 android:id="@+id/nav_audio_lyric"
-                android:icon="@drawable/ic_menu_camera"
+                android:icon="@drawable/ic_mic"
                 android:title="Audio Lyric" />
         </menu>
     </item>

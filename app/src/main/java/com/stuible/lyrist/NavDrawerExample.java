@@ -82,11 +82,11 @@ public class NavDrawerExample extends AppCompatActivity
 
         if (id == R.id.nav_all_lyrics) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_audio_lyrics) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_audio_lyric) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_all_lyrics) {
 
         } else if (id == R.id.nav_photo_lyric) {
 

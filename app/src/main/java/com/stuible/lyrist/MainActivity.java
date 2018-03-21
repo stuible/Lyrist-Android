@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -126,15 +126,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (id == R.id.nav_all_lyrics) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_text_lyric) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_photo_lyric) {
 
         } else if (id == R.id.nav_audio_lyric) {
 
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_audio_lyrics) {
+
+        } else if (id == R.id.nav_photo_lyrics) {
 
         }
 
