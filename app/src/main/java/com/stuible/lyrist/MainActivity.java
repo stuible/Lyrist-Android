@@ -1,6 +1,7 @@
 package com.stuible.lyrist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public MyDatabase db;
     public MyAdapter myAdapter;
     public MyHelper helper;
+    private Menu menu;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +83,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.menu = menu;
+        MenuItem sortBy = menu.findItem(R.id.sortByMenuButton);
+
+        SharedPreferences sharedPref = this.getPreferences(this.MODE_PRIVATE);
+        String order = sharedPref.getString(getString(R.string.pref_sort_order), "Sort By: Newest");
+
+        sortBy.setTitle(order);
+
+
         return true;
     }
 
@@ -101,10 +113,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        MenuItem sortBy = menu.findItem(R.id.sortByMenuButton);
         int id = item.getItemId();
+
+        SharedPreferences sharedPref =this.getPreferences(this.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_SortNewest) {
+            sortBy.setTitle("Sort By: Newest");
+            editor.putString(getString(R.string.pref_sort_order), "Sort By: Newest");
+            editor.apply();
+            return true;
+        }
+        if (id == R.id.action_SortOldest) {
+            sortBy.setTitle("Sort By: Oldest");
+            editor.putString(getString(R.string.pref_sort_order), "Sort By: Oldest");
+            editor.apply();
             return true;
         }
 
@@ -158,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Cursor cursor = db.getLyrics();
 
             int index1 = cursor.getColumnIndex(Constants.TITLE);
-            int index2 = cursor.getColumnIndex(Constants.LYRICS);
+            int index2 = cursor.getColumnIndex(Constants.TEXT_LYRICS);
 
             ArrayList<String> mArrayList = new ArrayList<>();
             cursor.moveToFirst();

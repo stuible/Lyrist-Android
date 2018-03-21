@@ -30,7 +30,7 @@
                 android:title="Text Lyric" />
             <item
                 android:id="@+id/nav_photo_lyric"
-                android:icon="@drawable/ic_menu_camera"
+                android:icon="@drawable/ic_camera"
                 android:title="Photo Lyric" />
             <item
                 android:id="@+id/nav_audio_lyric"

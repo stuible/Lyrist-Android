@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import static com.stuible.lyrist.Constants.DATABASE_NAME;
 
@@ -23,8 +24,13 @@ public class MyDatabase {
         db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constants.TITLE, title);
-        contentValues.put(Constants.LYRICS, lyrics);
-        long id = db.insert(Constants.LYRIC_TABLE_NAME, null, contentValues);
+//        contentValues.put(Constants.TEXT_LYRICS, lyrics);
+        long id = db.insert(Constants.LYRICS_TABLE_NAME, null, contentValues);
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(Constants.UID, id);
+        contentValues2.put(Constants.TEXT_LYRICS, lyrics);
+        db.insert(Constants.TEXT_LYRIC_TABLE_NAME, null, contentValues2);
         return id;
     }
 
@@ -33,9 +39,32 @@ public class MyDatabase {
 //        context.deleteDatabase(DATABASE_NAME);
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        String[] columns = {Constants.UID, Constants.TITLE, Constants.LYRICS};
-        Cursor cursor = db.query(Constants.LYRIC_TABLE_NAME, columns, null, null, null, null, null);
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.TEXT_LYRICS};
+
+//        Cursor cursor = db.query(Constants.LYRICS_TABLE_NAME, columns, null, null, null, null, null);
+//        return cursor;
+
+        String query = "SELECT " + String.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.TEXT_LYRIC_TABLE_NAME + " text WHERE lyrics."
+                + Constants.UID + " = text."
+                + Constants.UID;
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
         return cursor;
+
+//        // Building query using INNER JOIN keyword
+//        String query = "SELECT " + EMPLOYEE_ID_WITH_PREFIX + ","
+//        + EMPLOYEE_NAME_WITH_PREFIX + "," + DataBaseHelper.EMPLOYEE_DOB
+//        + "," + DataBaseHelper.EMPLOYEE_SALARY + ","
+//        + DataBaseHelper.EMPLOYEE_DEPARTMENT_ID + ","
+//        + DEPT_NAME_WITH_PREFIX + " FROM "
+//        + DataBaseHelper.EMPLOYEE_TABLE + " emp INNER JOIN "
+//        + DataBaseHelper.DEPARTMENT_TABLE + " dept ON emp."
+//        + DataBaseHelper.EMPLOYEE_DEPARTMENT_ID + " = dept."
+//        + DataBaseHelper.ID_COLUMN;
+
     }
 
 

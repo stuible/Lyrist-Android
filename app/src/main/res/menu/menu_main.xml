@@ -2,9 +2,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.stuible.lyrist.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="Sort By: Newest"
+        android:id="@+id/sortByMenuButton"
+        app:showAsAction="always|withText">
+        <menu>
+            <item
+                android:id="@+id/action_SortNewest"
+                android:title="Newest first" />
+            <item
+                android:id="@+id/action_SortOldest"
+                android:title="Oldest first" />
+        </menu>
+    </item>
+
+    <!--<item-->
+        <!--android:id="@+id/action_settings"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="@string/action_settings"-->
+        <!--app:showAsAction="never" />-->
 </menu>
