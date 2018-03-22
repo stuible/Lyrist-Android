@@ -24,7 +24,6 @@ public class MyDatabase {
         db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Constants.TITLE, title);
-//        contentValues.put(Constants.TEXT_LYRICS, lyrics);
         long id = db.insert(Constants.LYRICS_TABLE_NAME, null, contentValues);
 
         ContentValues contentValues2 = new ContentValues();
@@ -34,15 +33,26 @@ public class MyDatabase {
         return id;
     }
 
+    public long insertPhotoLyrics (String title, byte[] photo)
+    {
+        db = helper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Constants.TITLE, title);
+        long id = db.insert(Constants.LYRICS_TABLE_NAME, null, contentValues);
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(Constants.UID, id);
+        contentValues2.put(Constants.PHOTO_LYRICS, photo);
+        db.insert(Constants.PHOTO_LYRIC_TABLE_NAME, null, contentValues2);
+        return id;
+    }
+
     public Cursor getLyrics()
     {
 //        context.deleteDatabase(DATABASE_NAME);
         SQLiteDatabase db = helper.getWritableDatabase();
 
         String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.TEXT_LYRICS};
-
-//        Cursor cursor = db.query(Constants.LYRICS_TABLE_NAME, columns, null, null, null, null, null);
-//        return cursor;
 
         String query = "SELECT " + String.join(", ", columns) + " FROM "
                 + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
@@ -54,16 +64,26 @@ public class MyDatabase {
         Cursor cursor = db.rawQuery(query, null);
         return cursor;
 
-//        // Building query using INNER JOIN keyword
-//        String query = "SELECT " + EMPLOYEE_ID_WITH_PREFIX + ","
-//        + EMPLOYEE_NAME_WITH_PREFIX + "," + DataBaseHelper.EMPLOYEE_DOB
-//        + "," + DataBaseHelper.EMPLOYEE_SALARY + ","
-//        + DataBaseHelper.EMPLOYEE_DEPARTMENT_ID + ","
-//        + DEPT_NAME_WITH_PREFIX + " FROM "
-//        + DataBaseHelper.EMPLOYEE_TABLE + " emp INNER JOIN "
-//        + DataBaseHelper.DEPARTMENT_TABLE + " dept ON emp."
-//        + DataBaseHelper.EMPLOYEE_DEPARTMENT_ID + " = dept."
-//        + DataBaseHelper.ID_COLUMN;
+
+    }
+
+    public Cursor getPhotoLyrics()
+    {
+//        context.deleteDatabase(DATABASE_NAME);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.PHOTO_LYRICS};
+
+        String query = "SELECT " + String.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.PHOTO_LYRIC_TABLE_NAME + " photo WHERE lyrics."
+                + Constants.UID + " = photo."
+                + Constants.UID;
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+
 
     }
 

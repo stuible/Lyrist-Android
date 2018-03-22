@@ -1,10 +1,13 @@
 package com.stuible.lyrist;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,9 +97,26 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         Log.d("onBindViewHolder Pos", (String.valueOf(position)));
         String[]  results = (list.get(position).toString()).split(",");
-        Log.d("Item to List:", results[0] + ": " + results[1]);
-        holder.lyricTitleTextView.setText(results[0]);
-        holder.summeryTextView.setText(results[1]);
+        if(!results[0].equals("IMAGE")){
+            Log.d("Item to List:", results[0] + ": " + results[1]);
+            holder.lyricTitleTextView.setText(results[0]);
+            holder.summeryTextView.setText(results[1]);
+        }
+        else if (results[0].equals("IMAGE")){
+            Log.d("Item to List:", results[0] + ": " + results[1]);
+            holder.lyricTitleTextView.setText(results[1]);
+//            holder.summeryTextView.setText(results[2]);
+            holder.summeryTextView.setVisibility(View.INVISIBLE);
+            holder.myImage.setVisibility(View.VISIBLE);
+            byte[] bytes = Base64.decode(results[2], 0);
+
+            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+            holder.myImage.setImageBitmap(Bitmap.createScaledBitmap(bmp, 250,
+                    250, false));
+
+        }
+
         holder.update(position);
 
     }
@@ -111,6 +132,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         public TextView lyricTitleTextView;
         public TextView summeryTextView;
         public LinearLayout myLayout;
+        public ImageView myImage;
 
         Context context;
 
@@ -120,6 +142,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
             lyricTitleTextView = (TextView) itemView.findViewById(R.id.lyricTitle);
             summeryTextView = (TextView) itemView.findViewById(R.id.lyricSummery);
+            myImage = itemView.findViewById(R.id.imageView);
 
 
 

@@ -26,8 +26,17 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.TEXT_LYRICS + " TEXT NOT NULL, " +
                         "FOREIGN KEY ("+Constants.UID+") REFERENCES "+Constants.LYRICS_TABLE_NAME+"("+Constants.UID+"));";
 
+    private static final String CREATE_PHOTO_TABLE =
+            "CREATE TABLE "+
+                    Constants.PHOTO_LYRIC_TABLE_NAME + " (" +
+                    Constants.PHOTO_UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    Constants.UID + " INTEGER NOT NULL, " +
+                    Constants.PHOTO_LYRICS + " BLOB NOT NULL, " +
+                    "FOREIGN KEY ("+Constants.UID+") REFERENCES "+Constants.LYRICS_TABLE_NAME+"("+Constants.UID+"));";
+
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + Constants.LYRICS_TABLE_NAME +
-            "; DROP TABLE IF EXISTS " + Constants.TEXT_LYRIC_TABLE_NAME;
+            "; DROP TABLE IF EXISTS " + Constants.TEXT_LYRIC_TABLE_NAME +
+            "; DROP TABLE IF EXISTS " + Constants.PHOTO_LYRIC_TABLE_NAME;
 
     public MyHelper(Context context){
         super (context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
@@ -39,6 +48,7 @@ public class MyHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(CREATE_LYRIC_TABLE);
             db.execSQL(CREATE_TEXT_TABLE);
+            db.execSQL(CREATE_PHOTO_TABLE);
             Log.d("DB MESSAGE", "onCreate() called");
 //            Toast.makeText(context, "onCreate() called", Toast.LENGTH_LONG).show();
         } catch (SQLException e) {

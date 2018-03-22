@@ -1,10 +1,17 @@
 package com.stuible.lyrist;
 
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +24,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -26,8 +34,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -36,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public MyAdapter myAdapter;
     public MyHelper helper;
     private Menu menu;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    public Uri fileUri;
+
 
 
     @Override
@@ -166,7 +187,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Toast.LENGTH_SHORT).show();
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, 1);
+//                if (hasImageCaptureBug()) {
+//                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
+//                } else {
+//                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                }
+//                takePictureIntent.putExtra("return-data", true);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
 
         } else if (id == R.id.nav_audio_lyric) {
@@ -182,6 +209,109 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("Image Taken", "onActivityResultCalled");
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Log.d("Image Taken", "About to get Picture");
+            if (data.getData() != null) {
+                Log.d("Image Taken", "Data exists");
+                ParcelFileDescriptor parcelFileDescriptor = null;
+                try {
+                    parcelFileDescriptor = this.getContentResolver().openFileDescriptor(data.getData(), "r");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                try {
+                    parcelFileDescriptor.close();
+
+                } catch (IOException e) {
+                    Log.d("Image Taken", e.toString());
+                }
+            } else {
+                Log.d("Image Taken", "Data didn't exist");
+                Bitmap imageRetrieved = (Bitmap) data.getExtras().get("data");
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                imageRetrieved.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                Log.d("Image Taken", byteArray.toString());
+
+                long id = db.insertPhotoLyrics("Temp Title", byteArray);
+                if (id < 0)
+                {
+                    Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private static File getOutputMediaFile(int type){
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "JoshuaTree");
+
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d("JoshuaTree", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
+//    private static Uri getOutputMediaFileUri(int type){
+//        return Uri.fromFile(getOutputMediaFile(type));
+//    }
+//
+    private static Uri getOutputMediaFileUri(int type){
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+//
+//    private static Uri getOutputMediaFileUri(int type){
+//        return Uri.fromFile(getOutputMediaFile(type));
+//    }
+
+
+
+    public boolean hasImageCaptureBug() {
+
+        // list of known devices that have the bug
+        ArrayList<String> devices = new ArrayList<String>();
+        devices.add("android-devphone1/dream_devphone/dream");
+        devices.add("generic/sdk/generic");
+        devices.add("vodafone/vfpioneer/sapphire");
+        devices.add("tmobile/kila/dream");
+        devices.add("verizon/voles/sholes");
+        devices.add("google_ion/google_ion/sapphire");
+
+        return devices.contains(android.os.Build.BRAND + "/" + android.os.Build.PRODUCT + "/"
+                + android.os.Build.DEVICE);
+
+    }
+
     private class loadLyrics extends AsyncTask<URL, Integer, ArrayList<String>> {
         protected ArrayList<String> doInBackground(URL... urls) {
             Cursor cursor = db.getLyrics();
@@ -195,6 +325,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 String lyricTitle = cursor.getString(index1);
                 String lyrics = cursor.getString(index2);
                 String s = lyricTitle +"," + lyrics;
+                mArrayList.add(s);
+                Log.d("Found Item In Database", s);
+                cursor.moveToNext();
+            }
+
+
+
+            cursor = db.getPhotoLyrics();
+
+            index1 = cursor.getColumnIndex(Constants.TITLE);
+            index2 = cursor.getColumnIndex(Constants.PHOTO_LYRICS);
+
+//            mArrayList = new ArrayList<>();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String lyricTitle = cursor.getString(index1);
+                byte[] lyrics = cursor.getBlob(index2);
+                String encoded = Base64.encodeToString(lyrics, 0);
+                String s = "IMAGE," + lyricTitle +"," + encoded;
                 mArrayList.add(s);
                 Log.d("Found Item In Database", s);
                 cursor.moveToNext();
