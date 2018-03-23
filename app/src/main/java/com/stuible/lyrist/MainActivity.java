@@ -1,19 +1,14 @@
 package com.stuible.lyrist;
 
-import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,14 +30,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -55,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Menu menu;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    public Uri fileUri;
 
 
 
@@ -197,6 +188,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
         } else if (id == R.id.nav_audio_lyric) {
+            Intent myIntent = new Intent(getBaseContext(), AddAudioLyrics.class);
+            startActivity(myIntent);
 
         } else if (id == R.id.nav_audio_lyrics) {
 
@@ -256,45 +249,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private static File getOutputMediaFile(int type){
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "JoshuaTree");
-
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("JoshuaTree", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
-
-//    private static Uri getOutputMediaFileUri(int type){
-//        return Uri.fromFile(getOutputMediaFile(type));
-//    }
-//
-    private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-//
-//    private static Uri getOutputMediaFileUri(int type){
-//        return Uri.fromFile(getOutputMediaFile(type));
-//    }
-
-
 
     public boolean hasImageCaptureBug() {
 
@@ -318,13 +272,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             int index1 = cursor.getColumnIndex(Constants.TITLE);
             int index2 = cursor.getColumnIndex(Constants.TEXT_LYRICS);
+            int index3 = cursor.getColumnIndex(Constants.UID);
 
             ArrayList<String> mArrayList = new ArrayList<>();
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 String lyricTitle = cursor.getString(index1);
                 String lyrics = cursor.getString(index2);
-                String s = lyricTitle +"," + lyrics;
+                int uid = cursor.getInt(index3);
+                String s = uid+","+lyricTitle +"," + lyrics;
                 mArrayList.add(s);
                 Log.d("Found Item In Database", s);
                 cursor.moveToNext();
@@ -336,14 +292,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             index1 = cursor.getColumnIndex(Constants.TITLE);
             index2 = cursor.getColumnIndex(Constants.PHOTO_LYRICS);
+            index3 = cursor.getColumnIndex(Constants.UID);
 
-//            mArrayList = new ArrayList<>();
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 String lyricTitle = cursor.getString(index1);
+                int uid = cursor.getInt(index3);
                 byte[] lyrics = cursor.getBlob(index2);
                 String encoded = Base64.encodeToString(lyrics, 0);
-                String s = "IMAGE," + lyricTitle +"," + encoded;
+                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
                 mArrayList.add(s);
                 Log.d("Found Item In Database", s);
                 cursor.moveToNext();
@@ -356,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         protected void onPostExecute(ArrayList<String> result) {
-            myAdapter = new MyAdapter(result);
+            myAdapter = new MyAdapter(getBaseContext(), result);
             mRecyclerView = findViewById(R.id.LyricsRecyclerView);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(mLayoutManager);

@@ -29,6 +29,7 @@ public class AddTextLyrics extends AppCompatActivity {
         String lyrics = lyricsEditText.getText().toString();
         String date = "01-01-2007";
         Toast.makeText(this, title, Toast.LENGTH_SHORT).show();
+
         long id = db.insertLyrics(title, lyrics);
         if (id < 0)
         {

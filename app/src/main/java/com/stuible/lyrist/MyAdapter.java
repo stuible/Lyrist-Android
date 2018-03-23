@@ -1,6 +1,7 @@
 package com.stuible.lyrist;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.stuible.lyrist.R.layout.row;
 
@@ -29,6 +31,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 //    private ArrayList<Integer> items = new ArrayList<>();
     private boolean multiSelect = false;
     private ArrayList<Integer> selectedItems = new ArrayList<>();
+    private Context context;
+    public ArrayList<String> list;
+
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -51,13 +56,26 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             if(item.getItemId() == 0){
 
                 Log.d("Clicked", "Share");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (list.get(intItem).toString()).split(",");
+                    Log.d("Item to Share", results[0]);
+                    String shareBody = results[2];
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                    context.startActivity(Intent.createChooser(sharingIntent, "Share Using"));
+                }
+
+
 
             }
             else if(item.getItemId() == 1){
                 Log.d("Clicked", "Delete");
                 for (Integer intItem : selectedItems) {
-                    String[]  results = (list.get(intItem).toString()).split(",");
-                    Log.d("Item to delete", results[0]);
+//                    String[]  results = (list.get(intItem).toString()).split(",");
+                    Log.d("Item to delete", list.get(intItem).toString());
+                    Log.d("Item to delete", intItem.toString());
                     list.remove(intItem);
                 }
             }
@@ -74,12 +92,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     };
 
-    public ArrayList<String> list;
-//    private int selectedPos = RecyclerView.NO_POSITION;
-    Context context;
 
-    public MyAdapter(ArrayList<String> list) {
+//    private int selectedPos = RecyclerView.NO_POSITION;
+
+    public MyAdapter(Context context, ArrayList<String> list) {
         this.list = list;
+        Collections.sort(this.list);
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -97,18 +116,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         Log.d("onBindViewHolder Pos", (String.valueOf(position)));
         String[]  results = (list.get(position).toString()).split(",");
-        if(!results[0].equals("IMAGE")){
-            Log.d("Item to List:", results[0] + ": " + results[1]);
-            holder.lyricTitleTextView.setText(results[0]);
-            holder.summeryTextView.setText(results[1]);
-        }
-        else if (results[0].equals("IMAGE")){
-            Log.d("Item to List:", results[0] + ": " + results[1]);
+        if(!results[1].equals("IMAGE")){
+            Log.d("Item to List:", results[1] + ": " + results[2]);
             holder.lyricTitleTextView.setText(results[1]);
+            holder.summeryTextView.setText(results[2]);
+        }
+        else if (results[1].equals("IMAGE")){
+            Log.d("Item to List:", results[1] + ": " + results[2]);
+            holder.lyricTitleTextView.setText(results[2]);
 //            holder.summeryTextView.setText(results[2]);
             holder.summeryTextView.setVisibility(View.INVISIBLE);
             holder.myImage.setVisibility(View.VISIBLE);
-            byte[] bytes = Base64.decode(results[2], 0);
+            byte[] bytes = Base64.decode(results[3], 0);
 
             Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
