@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import static com.stuible.lyrist.Constants.DATABASE_NAME;
@@ -33,6 +34,11 @@ public class MyDatabase {
         return id;
     }
 
+    public boolean deleteLyrics(long id){
+        db = helper.getWritableDatabase();
+        return db.delete(Constants.LYRICS_TABLE_NAME, Constants.UID + "=" + id, null) > 0;
+    }
+
     public long insertPhotoLyrics (String title, byte[] photo)
     {
         db = helper.getWritableDatabase();
@@ -54,11 +60,14 @@ public class MyDatabase {
 
         String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.TEXT_LYRICS};
 
-        String query = "SELECT " + String.join(", ", columns) + " FROM "
+
+
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
                 + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
                 + Constants.TEXT_LYRIC_TABLE_NAME + " text WHERE lyrics."
                 + Constants.UID + " = text."
                 + Constants.UID;
+
 
         Log.d("query", query);
         Cursor cursor = db.rawQuery(query, null);
@@ -74,7 +83,7 @@ public class MyDatabase {
 
         String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.PHOTO_LYRICS};
 
-        String query = "SELECT " + String.join(", ", columns) + " FROM "
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
                 + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
                 + Constants.PHOTO_LYRIC_TABLE_NAME + " photo WHERE lyrics."
                 + Constants.UID + " = photo."
