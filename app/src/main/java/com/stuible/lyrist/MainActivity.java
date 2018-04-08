@@ -15,6 +15,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public MyAdapter myAdapter;
     public MyHelper helper;
     private Menu menu;
+    private boolean ascending = true;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -140,17 +143,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             sortBy.setTitle("Sort By: Newest");
             editor.putString(getString(R.string.pref_sort_order), "Sort By: Newest");
             editor.apply();
+            ascending = true;
+            new loadLyrics().execute();
             return true;
         }
         if (id == R.id.action_SortOldest) {
             sortBy.setTitle("Sort By: Oldest");
             editor.putString(getString(R.string.pref_sort_order), "Sort By: Oldest");
             editor.apply();
+            ascending = false;
+            new loadLyrics().execute();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+//    private void sortData(boolean asc)
+//    {
+//        //SORT ARRAY ASCENDING AND DESCENDING
+//        if (asc)
+//        {
+//            Collections.sort(spacecrafts);
+//        }
+//        else
+//        {
+//            Collections.reverse(spacecrafts);
+//        }
+//
+//        //ADAPTER
+//        myAdapter = new MyAdapter(this, spacecrafts);
+//        mRecyclerView.setAdapter(myAdapter);
+//
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -313,7 +338,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         protected void onPostExecute(ArrayList<String> result) {
-            myAdapter = new MyAdapter(getBaseContext(), result);
+
+            myAdapter = new MyAdapter(getBaseContext(), result, ascending);
             mRecyclerView = findViewById(R.id.LyricsRecyclerView);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -322,4 +348,75 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mRecyclerView.setAdapter(myAdapter);
         }
     }
+
+    private boolean multiSelect = false;
+    private ArrayList<Integer> selectedItems = new ArrayList<>();
+    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            multiSelect = true;
+            menu.add(0, 0, 0, "Share");
+            menu.add(0, 1, 0, "Delete");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            if(item.getItemId() == 0){
+
+                Log.d("Clicked", "Share");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
+                    Log.d("Item to Share", results[0]);
+                    String shareBody = results[2];
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                    startActivity(Intent.createChooser(sharingIntent, "Share Using"));
+                }
+
+
+
+            }
+            else if(item.getItemId() == 1){
+                Log.d("Clicked", "Delete");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
+                    Log.d("Item to delete", results[0]);
+                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
+                    if (attemptDelete == false)
+                    {
+                        Log.d("Delete", "Failed to delete");
+                    }
+                    else
+                    {
+                        Log.d("Delete", "Successfully deleted");
+//                        removeItem(intItem);
+
+                    }
+//                    Log.d("Item to delete", intItem.toString());
+
+                }
+            }
+
+
+            mode.finish();
+            return true;
+        }
+
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            multiSelect = false;
+            selectedItems.clear();
+            myAdapter.notifyDataSetChanged();
+        }
+    };
 }
