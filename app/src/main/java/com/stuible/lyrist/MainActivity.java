@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         protected void onPostExecute(ArrayList<String> result) {
 
-            myAdapter = new MyAdapter(getBaseContext(), result, ascending);
+            myAdapter = new MyAdapter(getBaseContext(), result, db, ascending);
             mRecyclerView = findViewById(R.id.LyricsRecyclerView);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -349,74 +349,74 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private boolean multiSelect = false;
-    private ArrayList<Integer> selectedItems = new ArrayList<>();
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            multiSelect = true;
-            menu.add(0, 0, 0, "Share");
-            menu.add(0, 1, 0, "Delete");
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
-            if(item.getItemId() == 0){
-
-                Log.d("Clicked", "Share");
-                for (Integer intItem : selectedItems) {
-                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
-                    Log.d("Item to Share", results[0]);
-                    String shareBody = results[2];
-                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                    sharingIntent.setType("text/plain");
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                    startActivity(Intent.createChooser(sharingIntent, "Share Using"));
-                }
-
-
-
-            }
-            else if(item.getItemId() == 1){
-                Log.d("Clicked", "Delete");
-                for (Integer intItem : selectedItems) {
-                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
-                    Log.d("Item to delete", results[0]);
-                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
-                    if (attemptDelete == false)
-                    {
-                        Log.d("Delete", "Failed to delete");
-                    }
-                    else
-                    {
-                        Log.d("Delete", "Successfully deleted");
-//                        removeItem(intItem);
-
-                    }
-//                    Log.d("Item to delete", intItem.toString());
-
-                }
-            }
-
-
-            mode.finish();
-            return true;
-        }
-
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            multiSelect = false;
-            selectedItems.clear();
-            myAdapter.notifyDataSetChanged();
-        }
-    };
+//    private boolean multiSelect = false;
+//    private ArrayList<Integer> selectedItems = new ArrayList<>();
+//    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+//        @Override
+//        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//            multiSelect = true;
+//            menu.add(0, 0, 0, "Share");
+//            menu.add(0, 1, 0, "Delete");
+//            return true;
+//        }
+//
+//        @Override
+//        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//
+//            if(item.getItemId() == 0){
+//
+//                Log.d("Clicked", "Share");
+//                for (Integer intItem : selectedItems) {
+//                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
+//                    Log.d("Item to Share", results[0]);
+//                    String shareBody = results[2];
+//                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+//                    sharingIntent.setType("text/plain");
+//                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
+//                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+//                    startActivity(Intent.createChooser(sharingIntent, "Share Using"));
+//                }
+//
+//
+//
+//            }
+//            else if(item.getItemId() == 1){
+//                Log.d("Clicked", "Delete");
+//                for (Integer intItem : selectedItems) {
+//                    String[]  results = (myAdapter.list.get(intItem).toString()).split(",");
+//                    Log.d("Item to delete", results[0]);
+//                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
+//                    if (attemptDelete == false)
+//                    {
+//                        Log.d("Delete", "Failed to delete");
+//                    }
+//                    else
+//                    {
+//                        Log.d("Delete", "Successfully deleted");
+////                        removeItem(intItem);
+//
+//                    }
+////                    Log.d("Item to delete", intItem.toString());
+//
+//                }
+//            }
+//
+//
+//            mode.finish();
+//            return true;
+//        }
+//
+//
+//        @Override
+//        public void onDestroyActionMode(ActionMode mode) {
+//            multiSelect = false;
+//            selectedItems.clear();
+//            myAdapter.notifyDataSetChanged();
+//        }
+//    };
 }

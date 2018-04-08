@@ -35,80 +35,82 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private Context context;
     public ArrayList<String> list;
     private boolean ascending = true;
+    private MyDatabase db;
 
-//    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-//        @Override
-//        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//            multiSelect = true;
-//            menu.add(0, 0, 0, "Share");
-//            menu.add(0, 1, 0, "Delete");
-//            return true;
-//        }
-//
-//        @Override
-//        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//
-//            if(item.getItemId() == 0){
-//
-//                Log.d("Clicked", "Share");
-//                for (Integer intItem : selectedItems) {
-//                    String[]  results = (list.get(intItem).toString()).split(",");
-//                    Log.d("Item to Share", results[0]);
-//                    String shareBody = results[2];
-//                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-//                    sharingIntent.setType("text/plain");
-//                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
-//                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-//                    context.startActivity(Intent.createChooser(sharingIntent, "Share Using"));
-//                }
-//
-//
-//
-//            }
-//            else if(item.getItemId() == 1){
-//                Log.d("Clicked", "Delete");
-//                for (Integer intItem : selectedItems) {
-//                    String[]  results = (list.get(intItem).toString()).split(",");
-//                    Log.d("Item to delete", results[0]);
-//                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
-//                    if (attemptDelete == false)
-//                    {
-//                        Log.d("Delete", "Failed to delete");
-//                    }
-//                    else
-//                    {
-//                        Log.d("Delete", "Successfully deleted");
-////                        removeItem(intItem);
-//
-//                    }
-////                    Log.d("Item to delete", intItem.toString());
-//
-//                }
-//            }
-//
-//
-//            mode.finish();
-//            return true;
-//        }
-//
-//
-//        @Override
-//        public void onDestroyActionMode(ActionMode mode) {
-//            multiSelect = false;
-//            selectedItems.clear();
-//            notifyDataSetChanged();
-//        }
-//    };
+    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            multiSelect = true;
+            menu.add(0, 0, 0, "Share");
+            menu.add(0, 1, 0, "Delete");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            if(item.getItemId() == 0){
+
+                Log.d("Clicked", "Share");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (list.get(intItem).toString()).split(",");
+                    Log.d("Item to Share", results[0]);
+                    String shareBody = results[2];
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, results[1]);
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                    context.startActivity(Intent.createChooser(sharingIntent, "Share Using"));
+                }
+
+
+
+            }
+            else if(item.getItemId() == 1){
+                Log.d("Clicked", "Delete");
+                for (Integer intItem : selectedItems) {
+                    String[]  results = (list.get(intItem).toString()).split(",");
+                    Log.d("Item to delete", results[0]);
+                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
+                    if (attemptDelete == false)
+                    {
+                        Log.d("Delete", "Failed to delete");
+                    }
+                    else
+                    {
+                        Log.d("Delete", "Successfully deleted");
+//                        removeItem(intItem);
+
+                    }
+                    Log.d("Item to delete", intItem.toString());
+                    removeItem(intItem);
+
+                }
+            }
+
+
+            mode.finish();
+            return true;
+        }
+
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            multiSelect = false;
+            selectedItems.clear();
+            notifyDataSetChanged();
+        }
+    };
 
 
 //    private int selectedPos = RecyclerView.NO_POSITION;
 
-    public MyAdapter(Context context, ArrayList<String> list, boolean ascending) {
+    public MyAdapter(Context context, ArrayList<String> list, MyDatabase db, boolean ascending) {
         this.list = list;
         if(ascending){
             Collections.sort(this.list);
@@ -117,6 +119,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             Collections.reverse(this.list);
         }
         this.context = context.getApplicationContext();
+        this.db = db;
     }
 
     public void removeItem(int position) {
@@ -220,14 +223,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 //                frameLayout.setBackgroundColor(Color.WHITE);
                 myLayout.setBackgroundResource(R.drawable.lyric_card);
             }
-//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View view) {
-//                    ((AppCompatActivity)view.getContext()).startSupportActionMode(context.actionModeCallbacks);
-//                    selectItem(value);
-//                    return true;
-//                }
-//            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
+                    selectItem(value);
+                    return true;
+                }
+            });
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
