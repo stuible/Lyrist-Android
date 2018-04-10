@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
+//Is used to sort Lyrics
 public class LyricCompare implements Comparator<Lyrics> {
 
     public boolean newestFirst = true;

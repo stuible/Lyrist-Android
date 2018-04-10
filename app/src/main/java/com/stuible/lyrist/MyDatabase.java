@@ -53,7 +53,7 @@ public class MyDatabase {
         return db.delete(Constants.LYRICS_TABLE_NAME, Constants.UID + "=" + id, null) > 0;
     }
 
-    public long insertPhotoLyrics (String title, byte[] photo)
+    public long insertPhotoLyrics (String title, String photo)
     {
         db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();

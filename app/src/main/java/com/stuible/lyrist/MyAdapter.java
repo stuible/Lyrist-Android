@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -36,6 +40,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private Context context;
     public ArrayList<String> list;
     public ArrayList<Lyrics> lyrics;
+    final MediaPlayer mp = new MediaPlayer();
+
 
 
     private MyDatabase db;
@@ -77,9 +83,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             else if(item.getItemId() == 1){
                 Log.d("Clicked", "Delete");
                 for (Integer intItem : selectedItems) {
-                    String[]  results = (list.get(intItem).toString()).split(",");
-                    Log.d("Item to delete", results[0]);
-                    boolean attemptDelete = db.deleteLyrics(Long.parseLong(results[0]));
+                    Lyrics result = lyrics.get(intItem);
+                    Log.d("Item to delete", result.title);
+                    boolean attemptDelete = db.deleteLyrics(result.UID);
                     if (attemptDelete == false)
                     {
                         Log.d("Delete", "Failed to delete");
@@ -147,7 +153,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
 
         Log.d("onBindViewHolder Pos", (String.valueOf(position)));
-        Lyrics lyric = lyrics.get(position);
+        final Lyrics lyric = lyrics.get(position);
 
         if(!lyric.type.equals("IMAGE") && !lyric.type.equals("AUDIO")){
             Log.d("Item to List:", lyric.type + ": " + lyric.title);
@@ -160,12 +166,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 //            holder.summeryTextView.setText(results[2]);
             holder.summeryTextView.setVisibility(View.INVISIBLE);
             holder.myImage.setVisibility(View.VISIBLE);
-            byte[] bytes = Base64.decode(lyric.body, 0);
 
-            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-            holder.myImage.setImageBitmap(Bitmap.createScaledBitmap(bmp, 250,
-                    250, false));
+            String mFileName = "";
+            mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+            mFileName += "/Lyrist/Images/" + lyric.body;
+
+            holder.myImage.setImageBitmap(BitmapFactory.decodeFile(mFileName));
 
         }
         else if (lyric.type.equals("AUDIO")){
@@ -178,10 +185,30 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 @Override
                 public void onClick(View v) {
                     Log.d("Audio Lyric", "Play");
+                    String mFileName = "";
+                    mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+                    mFileName += File.separator + "Lyrist" + File.separator + lyric.body + ".3gp";
+
+                    if(mp.isPlaying())
+                    {
+                        mp.stop();
+                    }
+
+                    try {
+                        mp.reset();
+
+                        mp.setDataSource(mFileName);
+                        mp.prepare();
+                        mp.start();
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
-        
+
 
         holder.update(position);
 
@@ -255,9 +282,27 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                 @Override
                 public void onClick(View view) {
                     selectItem(value);
+                    Lyrics result = lyrics.get(value);
                     Toast.makeText(context,
-                    "You have clicked " + ((TextView)view.findViewById(R.id.lyricTitle)).getText().toString(),
+                    "You have clicked " + result.title,
                     Toast.LENGTH_SHORT).show();
+
+                    if(result.type == "IMAGE"){
+                        Intent myIntent = new Intent(context, PhotoEditor.class);
+                        myIntent.putExtra("ID", result.UID);
+                        context.startActivity(myIntent);
+                    }
+                    else if(result.type == "AUDIO"){
+                        Intent myIntent = new Intent(context, AudioEditor.class);
+                        myIntent.putExtra("ID", result.UID);
+                        context.startActivity(myIntent);
+                    }
+                    else {
+                        Intent myIntent = new Intent(context, TextEditor.class);
+                        myIntent.putExtra("ID", result.UID);
+                        context.startActivity(myIntent);
+                    }
+
                 }
             });
 

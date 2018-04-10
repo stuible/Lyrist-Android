@@ -31,7 +31,7 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.PHOTO_LYRIC_TABLE_NAME + " (" +
                     Constants.PHOTO_UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Constants.UID + " INTEGER NOT NULL, " +
-                    Constants.PHOTO_LYRICS + " BLOB NOT NULL, " +
+                    Constants.PHOTO_LYRICS + " TEXT NOT NULL, " +
                     "FOREIGN KEY ("+Constants.UID+") REFERENCES "+Constants.LYRICS_TABLE_NAME+"("+Constants.UID+")ON DELETE CASCADE);";
 
     private static final String CREATE_AUDIO_TABLE =

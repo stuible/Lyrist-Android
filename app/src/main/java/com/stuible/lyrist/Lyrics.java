@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
+//Object that stores Lyrics
 public class Lyrics {
 
     public String title;
