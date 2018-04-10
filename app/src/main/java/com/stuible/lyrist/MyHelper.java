@@ -39,13 +39,18 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.AUDIO_LYRIC_TABLE_NAME + " (" +
                     Constants.AUDIO_UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Constants.UID + " INTEGER NOT NULL, " +
-                    Constants.AUDIO_LYRICS + " BLOB NOT NULL, " +
+                    Constants.AUDIO_LYRICS + " TEXT NOT NULL, " +
                     "FOREIGN KEY ("+Constants.UID+") REFERENCES "+Constants.LYRICS_TABLE_NAME+"("+Constants.UID+")ON DELETE CASCADE);";
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + Constants.LYRICS_TABLE_NAME +
             "; DROP TABLE IF EXISTS " + Constants.TEXT_LYRIC_TABLE_NAME +
             "; DROP TABLE IF EXISTS " + Constants.PHOTO_LYRIC_TABLE_NAME +
             "; DROP TABLE IF EXISTS " + Constants.AUDIO_LYRIC_TABLE_NAME;
+
+    private static final String DROP_LYRICS = "DROP TABLE IF EXISTS " + Constants.LYRICS_TABLE_NAME;
+    private static final String DROP_TEXT = "DROP TABLE IF EXISTS " + Constants.TEXT_LYRIC_TABLE_NAME;
+    private static final String DROP_PHOTO = "DROP TABLE IF EXISTS " + Constants.PHOTO_LYRIC_TABLE_NAME;
+    private static final String DROP_AUDIO = "DROP TABLE IF EXISTS " + Constants.AUDIO_LYRIC_TABLE_NAME;
 
     public MyHelper(Context context){
         super (context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
@@ -58,6 +63,7 @@ public class MyHelper extends SQLiteOpenHelper {
             db.execSQL(CREATE_LYRIC_TABLE);
             db.execSQL(CREATE_TEXT_TABLE);
             db.execSQL(CREATE_PHOTO_TABLE);
+            Log.d("DB MESSAGE", "About to create audio Table");
             db.execSQL(CREATE_AUDIO_TABLE);
             Log.d("DB MESSAGE", "onCreate() called");
 //            Toast.makeText(context, "onCreate() called", Toast.LENGTH_LONG).show();
@@ -70,7 +76,10 @@ public class MyHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
-            db.execSQL(DROP_TABLE);
+            db.execSQL(DROP_LYRICS);
+            db.execSQL(DROP_TEXT);
+            db.execSQL(DROP_AUDIO);
+            db.execSQL(DROP_PHOTO);
             onCreate(db);
             Log.d("DB MESSAGE", "onUpgrade() called");
 //            Toast.makeText(context, "onUpgrade called", Toast.LENGTH_LONG).show();

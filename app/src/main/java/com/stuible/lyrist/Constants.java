@@ -11,7 +11,7 @@ public class Constants {
     public static final String UID = "lid";
     public static final String TITLE = "Title";
     public static final String DATE = "Date";
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 14;
 
     //TEXTLYRICS
     public static final String TEXT_LYRIC_TABLE_NAME = "TEXTLYRICS";

@@ -19,10 +19,13 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static android.os.Environment.getExternalStorageDirectory;
 
@@ -31,9 +34,15 @@ public class AddAudioLyrics extends AppCompatActivity {
     private static MediaRecorder mediaRecorder;
     private static MediaPlayer mediaPlayer;
 
-    private static String audioFilePath;
+    public TextView titleEditText;
+
+//    private static String audioFilePath;
     private static Button playButton;
     private static Button recordButton;
+
+    MyDatabase db;
+
+    public String uniqueFilename;
 
     public boolean isRecording = false;
     boolean mStartRecording = true;
@@ -69,6 +78,13 @@ public class AddAudioLyrics extends AppCompatActivity {
         recordButton = (Button) findViewById(R.id.btn_record);
         playButton = (Button) findViewById(R.id.btn_play);
 
+        titleEditText = findViewById(R.id.titleEditText);
+
+        db = new MyDatabase(this);
+
+        UUID uuid = UUID.randomUUID();
+        this.uniqueFilename = uuid.toString();
+
         File folder = new File(Environment.getExternalStorageDirectory() +
                 File.separator + "Lyrist");
         boolean success = true;
@@ -83,23 +99,15 @@ public class AddAudioLyrics extends AppCompatActivity {
 
         // Record to the external cache directory for visibility
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-        mFileName += "/Lyrist/audiorecordtest.3gp";
+        mFileName += "/Lyrist/" + uniqueFilename + ".3gp";
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
         verifyStoragePermissions(this);
 
-//        if (!hasMicrophone())
-//        {
-//            playButton.setEnabled(false);
-//            recordButton.setEnabled(false);
-//        } else {
-//            playButton.setEnabled(false);
-//        }
-
-        audioFilePath =
-                Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/myaudio.3gp";
+//        audioFilePath =
+//                Environment.getExternalStorageDirectory().getAbsolutePath()
+//                        + "/myaudio.3gp";
 
     }
 
@@ -110,7 +118,7 @@ public class AddAudioLyrics extends AppCompatActivity {
 
     private MediaRecorder mRecorder = null;
 
-    private PlayButton   mPlayButton = null;
+//    private PlayButton   mPlayButton = null;
     private MediaPlayer   mPlayer = null;
 
     // Requesting permission to RECORD_AUDIO
@@ -203,6 +211,30 @@ public class AddAudioLyrics extends AppCompatActivity {
         mStartPlaying = !mStartPlaying;
     }
 
+    public void addLyricEntry (View view)
+    {
+        String title = titleEditText.getText().toString();
+        String filename = uniqueFilename;
+//        String date = "01-01-2007";
+        Toast.makeText(this, title, Toast.LENGTH_SHORT).show();
+
+        long id = db.insertAudioLyrics(title, filename);
+        if (id < 0)
+        {
+            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
+        }
+//        TitleEditText.setText("");
+//        lyricsEditText.setText("");
+
+        Intent myIntent = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(myIntent);
+
+    }
+
 //    class RecordButton extends Button {
 //        boolean mStartRecording = true;
 //
@@ -225,27 +257,27 @@ public class AddAudioLyrics extends AppCompatActivity {
 //        }
 //    }
 
-    class PlayButton extends android.support.v7.widget.AppCompatButton {
-        boolean mStartPlaying = true;
-
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                onPlay(mStartPlaying);
-                if (mStartPlaying) {
-                    setText("Stop playing");
-                } else {
-                    setText("Start playing");
-                }
-                mStartPlaying = !mStartPlaying;
-            }
-        };
-
-        public PlayButton(Context ctx) {
-            super(ctx);
-            setText("Start playing");
-            setOnClickListener(clicker);
-        }
-    }
+//    class PlayButton extends android.support.v7.widget.AppCompatButton {
+//        boolean mStartPlaying = true;
+//
+//        OnClickListener clicker = new OnClickListener() {
+//            public void onClick(View v) {
+//                onPlay(mStartPlaying);
+//                if (mStartPlaying) {
+//                    setText("Stop playing");
+//                } else {
+//                    setText("Start playing");
+//                }
+//                mStartPlaying = !mStartPlaying;
+//            }
+//        };
+//
+//        public PlayButton(Context ctx) {
+//            super(ctx);
+//            setText("Start playing");
+//            setOnClickListener(clicker);
+//        }
+//    }
 
 
 

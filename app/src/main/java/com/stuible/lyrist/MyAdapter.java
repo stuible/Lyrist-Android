@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -148,7 +149,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         Log.d("onBindViewHolder Pos", (String.valueOf(position)));
         Lyrics lyric = lyrics.get(position);
 
-        if(!lyric.type.equals("IMAGE")){
+        if(!lyric.type.equals("IMAGE") && !lyric.type.equals("AUDIO")){
             Log.d("Item to List:", lyric.type + ": " + lyric.title);
             holder.lyricTitleTextView.setText(lyric.title);
             holder.summeryTextView.setText(lyric.body);
@@ -167,6 +168,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                     250, false));
 
         }
+        else if (lyric.type.equals("AUDIO")){
+            Log.d("Item to List:", lyric.type + ": " + lyric.title);
+            holder.lyricTitleTextView.setText(lyric.title);
+//            holder.summeryTextView.setText(results[2]);
+            holder.summeryTextView.setVisibility(View.INVISIBLE);
+            holder.playButton.setVisibility(View.VISIBLE);
+            holder.playButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("Audio Lyric", "Play");
+                }
+            });
+        }
+        
 
         holder.update(position);
 
@@ -184,6 +199,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         public TextView summeryTextView;
         public LinearLayout myLayout;
         public ImageView myImage;
+        public Button playButton;
 
         Context context;
 
@@ -194,6 +210,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             lyricTitleTextView = (TextView) itemView.findViewById(R.id.lyricTitle);
             summeryTextView = (TextView) itemView.findViewById(R.id.lyricSummery);
             myImage = itemView.findViewById(R.id.imageView);
+            playButton = itemView.findViewById(R.id.playButton);
 
 
 

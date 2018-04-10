@@ -34,6 +34,20 @@ public class MyDatabase {
         return id;
     }
 
+    public long insertAudioLyrics (String title, String soundFile)
+    {
+        db = helper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Constants.TITLE, title);
+        long id = db.insert(Constants.LYRICS_TABLE_NAME, null, contentValues);
+
+        ContentValues contentValues2 = new ContentValues();
+        contentValues2.put(Constants.UID, id);
+        contentValues2.put(Constants.AUDIO_LYRICS, soundFile);
+        db.insert(Constants.AUDIO_LYRIC_TABLE_NAME, null, contentValues2);
+        return id;
+    }
+
     public boolean deleteLyrics(long id){
         db = helper.getWritableDatabase();
         return db.delete(Constants.LYRICS_TABLE_NAME, Constants.UID + "=" + id, null) > 0;
@@ -87,6 +101,26 @@ public class MyDatabase {
                 + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
                 + Constants.PHOTO_LYRIC_TABLE_NAME + " photo WHERE lyrics."
                 + Constants.UID + " = photo."
+                + Constants.UID;
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+
+
+    }
+
+    public Cursor getAudioLyrics()
+    {
+//        context.deleteDatabase(DATABASE_NAME);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.AUDIO_LYRICS};
+
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.AUDIO_LYRIC_TABLE_NAME + " audio WHERE lyrics."
+                + Constants.UID + " = audio."
                 + Constants.UID;
 
         Log.d("query", query);

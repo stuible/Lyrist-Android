@@ -382,6 +382,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
 
+            if(viewAudioLyrics) {
+                Log.d("Database", "About to load Audio Lyrics");
+                Cursor cursor = db.getAudioLyrics();
+
+                int index1 = cursor.getColumnIndex(Constants.TITLE);
+                int index2 = cursor.getColumnIndex(Constants.AUDIO_LYRICS);
+                int index3 = cursor.getColumnIndex(Constants.UID);
+                int index4 = cursor.getColumnIndex(Constants.DATE);
+
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    String lyricTitle = cursor.getString(index1);
+                    int uid = cursor.getInt(index3);
+                    String date = cursor.getString(index4);
+                    String filename = cursor.getString(index2);
+//                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
+//                mArrayList.add(s);
+                    mArrayList.add(new Lyrics("AUDIO", uid, lyricTitle, filename, date));
+                    Log.d("Found Item In Database", lyricTitle);
+                    cursor.moveToNext();
+                }
+            }
+
             return mArrayList;
         }
 
