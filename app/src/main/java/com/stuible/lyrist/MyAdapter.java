@@ -34,7 +34,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private ArrayList<Integer> selectedItems = new ArrayList<>();
     private Context context;
     public ArrayList<String> list;
-    private boolean ascending = true;
+    public ArrayList<Lyrics> lyrics;
+
+
     private MyDatabase db;
 
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
@@ -110,13 +112,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
 //    private int selectedPos = RecyclerView.NO_POSITION;
 
-    public MyAdapter(Context context, ArrayList<String> list, MyDatabase db, boolean ascending) {
-        this.list = list;
+    public MyAdapter(Context context, ArrayList<Lyrics> list, MyDatabase db, boolean ascending) {
+        this.lyrics = list;
         if(ascending){
-            Collections.sort(this.list);
+            Collections.sort(this.lyrics,  new LyricCompare(true));
         }
         else {
-            Collections.reverse(this.list);
+            Collections.sort(this.lyrics,  new LyricCompare(false));
         }
         this.context = context.getApplicationContext();
         this.db = db;
@@ -124,7 +126,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     public void removeItem(int position) {
         Log.d("Delete", "called removeItem");
-        this.list.remove(position);
+        this.lyrics.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,getItemCount());
     }
@@ -144,19 +146,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
 
         Log.d("onBindViewHolder Pos", (String.valueOf(position)));
-        String[]  results = (list.get(position).toString()).split(",");
-        if(!results[1].equals("IMAGE")){
-            Log.d("Item to List:", results[1] + ": " + results[2]);
-            holder.lyricTitleTextView.setText(results[1]);
-            holder.summeryTextView.setText(results[2]);
+        Lyrics lyric = lyrics.get(position);
+
+        if(!lyric.type.equals("IMAGE")){
+            Log.d("Item to List:", lyric.type + ": " + lyric.title);
+            holder.lyricTitleTextView.setText(lyric.title);
+            holder.summeryTextView.setText(lyric.body);
         }
-        else if (results[1].equals("IMAGE")){
-            Log.d("Item to List:", results[1] + ": " + results[2]);
-            holder.lyricTitleTextView.setText(results[2]);
+        else if (lyric.type.equals("IMAGE")){
+            Log.d("Item to List:", lyric.type + ": " + lyric.title);
+            holder.lyricTitleTextView.setText(lyric.title);
 //            holder.summeryTextView.setText(results[2]);
             holder.summeryTextView.setVisibility(View.INVISIBLE);
             holder.myImage.setVisibility(View.VISIBLE);
-            byte[] bytes = Base64.decode(results[3], 0);
+            byte[] bytes = Base64.decode(lyric.body, 0);
 
             Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
@@ -172,7 +175,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return lyrics.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{

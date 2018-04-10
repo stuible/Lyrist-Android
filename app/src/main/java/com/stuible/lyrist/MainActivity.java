@@ -15,7 +15,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,14 +30,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -48,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public MyHelper helper;
     private Menu menu;
     private boolean ascending = true;
+
+    public boolean viewTextLyrics = true;
+    public boolean viewPhotoLyrics = true;
+    public boolean viewAudioLyrics = true;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -192,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int id = item.getItemId();
 
         if (id == R.id.nav_all_lyrics) {
+            viewTextLyrics = true;
+            viewAudioLyrics = true;
+            viewPhotoLyrics = true;
+            Log.d("Clicked Sidebar", "All Lyrics");
+            new loadLyrics().execute();
             // Handle the camera action
         } else if (id == R.id.nav_text_lyric) {
             Intent myIntent = new Intent(getBaseContext(), AddTextLyrics.class);
@@ -217,8 +224,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             startActivity(myIntent);
 
         } else if (id == R.id.nav_audio_lyrics) {
+            viewTextLyrics = false;
+            viewAudioLyrics = true;
+            viewPhotoLyrics = false;
+            Log.d("Clicked Sidebar", "Audio Lyrics");
+            new loadLyrics().execute();
 
         } else if (id == R.id.nav_photo_lyrics) {
+            viewTextLyrics = false;
+            viewAudioLyrics = false;
+            viewPhotoLyrics = true;
+            Log.d("Clicked Sidebar", "Photo Lyrics");
+            new loadLyrics().execute();
+
+        }else if (id == R.id.nav_text_lyrics) {
+            viewTextLyrics = true;
+            viewAudioLyrics = false;
+            viewPhotoLyrics = false;
+            Log.d("Clicked Sidebar", "Text Lyrics");
+            new loadLyrics().execute();
 
         }
 
@@ -291,44 +315,57 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private class loadLyrics extends AsyncTask<URL, Integer, ArrayList<String>> {
-        protected ArrayList<String> doInBackground(URL... urls) {
-            Cursor cursor = db.getLyrics();
+    private class loadLyrics extends AsyncTask<URL, Integer, ArrayList<Lyrics>> {
+        protected ArrayList<Lyrics> doInBackground(URL... urls) {
+            ArrayList<Lyrics> mArrayList = new ArrayList<>();
 
-            int index1 = cursor.getColumnIndex(Constants.TITLE);
-            int index2 = cursor.getColumnIndex(Constants.TEXT_LYRICS);
-            int index3 = cursor.getColumnIndex(Constants.UID);
+            if(viewTextLyrics){
+                Cursor cursor = db.getLyrics();
 
-            ArrayList<String> mArrayList = new ArrayList<>();
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                String lyricTitle = cursor.getString(index1);
-                String lyrics = cursor.getString(index2);
-                int uid = cursor.getInt(index3);
-                String s = uid+","+lyricTitle +"," + lyrics;
-                mArrayList.add(s);
-                Log.d("Found Item In Database", s);
-                cursor.moveToNext();
+
+                int index1 = cursor.getColumnIndex(Constants.TITLE);
+                int index2 = cursor.getColumnIndex(Constants.TEXT_LYRICS);
+                int index3 = cursor.getColumnIndex(Constants.UID);
+                int index4 = cursor.getColumnIndex(Constants.DATE);
+
+
+
+
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    String lyricTitle = cursor.getString(index1);
+                    String lyrics = cursor.getString(index2);
+                    int uid = cursor.getInt(index3);
+                    String date = cursor.getString(index4);
+//                String s = uid+","+lyricTitle +"," + lyrics;
+                    mArrayList.add(new Lyrics("TEXT", uid, lyricTitle,lyrics, date));
+                    Log.d("Found Item In Database", lyricTitle + " " + date);
+                    cursor.moveToNext();
+                }
             }
 
 
+            if(viewPhotoLyrics) {
+                Cursor cursor = db.getPhotoLyrics();
 
-            cursor = db.getPhotoLyrics();
+                int index1 = cursor.getColumnIndex(Constants.TITLE);
+                int index2 = cursor.getColumnIndex(Constants.PHOTO_LYRICS);
+                int index3 = cursor.getColumnIndex(Constants.UID);
+                int index4 = cursor.getColumnIndex(Constants.DATE);
 
-            index1 = cursor.getColumnIndex(Constants.TITLE);
-            index2 = cursor.getColumnIndex(Constants.PHOTO_LYRICS);
-            index3 = cursor.getColumnIndex(Constants.UID);
-
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                String lyricTitle = cursor.getString(index1);
-                int uid = cursor.getInt(index3);
-                byte[] lyrics = cursor.getBlob(index2);
-                String encoded = Base64.encodeToString(lyrics, 0);
-                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
-                mArrayList.add(s);
-                Log.d("Found Item In Database", s);
-                cursor.moveToNext();
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    String lyricTitle = cursor.getString(index1);
+                    int uid = cursor.getInt(index3);
+                    String date = cursor.getString(index4);
+                    byte[] lyrics = cursor.getBlob(index2);
+                    String encoded = Base64.encodeToString(lyrics, 0);
+//                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
+//                mArrayList.add(s);
+                    mArrayList.add(new Lyrics("IMAGE", uid, lyricTitle, encoded, date));
+                    Log.d("Found Item In Database", lyricTitle);
+                    cursor.moveToNext();
+                }
             }
 
             return mArrayList;
@@ -337,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         protected void onProgressUpdate(Integer... progress) {
         }
 
-        protected void onPostExecute(ArrayList<String> result) {
+        protected void onPostExecute(ArrayList<Lyrics> result) {
 
             myAdapter = new MyAdapter(getBaseContext(), result, db, ascending);
             mRecyclerView = findViewById(R.id.LyricsRecyclerView);
