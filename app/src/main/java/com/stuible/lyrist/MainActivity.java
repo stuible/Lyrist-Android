@@ -48,6 +48,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener{
 
+    //Variables
     public RecyclerView mRecyclerView;
     public MyDatabase db;
     public MyAdapter myAdapter;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+    //When app starts
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        //Attach elements by ID
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -93,29 +96,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         navigationView.setNavigationItemSelectedListener(this);
 
         //For Photo Saving
-        UUID uuid = UUID.randomUUID();
-        this.uniqueFilename = uuid.toString();
+        generateNewPhotoID();
 
-        Log.d("Generated UUID", this.uniqueFilename);
-
+        //Set folder where we store images
         this.imageFolder = new File(Environment.getExternalStorageDirectory() +
                 File.separator + "Lyrist" + File.separator + "Images");
 
         boolean success = true;
+
+        //Create folder if it doesn't yet exist
         if (!this.imageFolder.exists()) {
             success = this.imageFolder.mkdirs();
         }
         if (success) {
-            // Do something on success
         } else {
-            // Do something else on failure
         }
 
 
     }
 
+    //Close drawer when back button is pressed
     @Override
     public void onBackPressed() {
+        //Close sidebar when back button is pressed
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -126,9 +129,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+    //Create action options menu for the long press items
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Add Items of menu
         getMenuInflater().inflate(R.menu.menu_main, menu);
         this.menu = menu;
         MenuItem sortBy = menu.findItem(R.id.sortByMenuButton);
@@ -149,16 +153,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db = new MyDatabase(this);
         helper = new MyHelper(this);
 
+        //Reload lyrics
         new loadLyrics().execute();
 
 
     }
 
+    //When items are selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here.
         MenuItem sortBy = menu.findItem(R.id.sortByMenuButton);
         int id = item.getItemId();
 
@@ -166,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         SharedPreferences.Editor editor = sharedPref.edit();
 
 
-        //noinspection SimplifiableIfStatement
+        //Check which button was pressed
         if (id == R.id.action_settings) {
             return true;
         }
@@ -190,24 +194,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-//    private void sortData(boolean asc)
-//    {
-//        //SORT ARRAY ASCENDING AND DESCENDING
-//        if (asc)
-//        {
-//            Collections.sort(spacecrafts);
-//        }
-//        else
-//        {
-//            Collections.reverse(spacecrafts);
-//        }
-//
-//        //ADAPTER
-//        myAdapter = new MyAdapter(this, spacecrafts);
-//        mRecyclerView.setAdapter(myAdapter);
-//
-//    }
-
+    //Triggered on item click
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         LinearLayout clickedRow = (LinearLayout) view;
@@ -216,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toast.makeText(this, "row " + (1+position) + ":  " + titleTextView.getText() + " " + summeryTextView.getText(), Toast.LENGTH_LONG).show();
     }
 
+    //Code for sidebar
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -239,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Toast.LENGTH_SHORT).show();
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+            //create file
             File f = null;
             try {
                 f = createImageFile();
@@ -247,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
 
+            //create URO for storing photo
 
             Uri photoURI = FileProvider.getUriForFile(MainActivity.this,
                     "com.stuible.lyrist.provider",
@@ -257,12 +247,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//                if (hasImageCaptureBug()) {
-//                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/tmp")));
-//                } else {
-//                    takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                }
-//                takePictureIntent.putExtra("return-data", true);
+
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
 
@@ -298,43 +283,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
-    private String getAlbumName() {
-        return "Lyrist";
-    }
 
-    private File getAlbumDir() {
-        File storageDir = null;
-
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-
-            storageDir = imageFolder;
-
-            if (storageDir != null) {
-                if (! storageDir.mkdirs()) {
-                    if (! storageDir.exists()){
-                        Log.d("CameraSample", "failed to create directory");
-                        return null;
-                    }
-                }
-            }
-
-        } else {
-            Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
-        }
-
-        return storageDir;
-    }
-
+    //Create new random name for image
     public void generateNewPhotoID(){
+        UUID uuid = UUID.randomUUID();
+        this.uniqueFilename = uuid.toString();
 
+        Log.d("Generated UUID", this.uniqueFilename);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Once Image is taken, insert location into database
         Log.d("Image Taken", "onActivityResultCalled");
+
+        generateNewPhotoID();
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
             Log.d("Image Taken", "About to get Picture");
 
             Log.d("Adding to DB", photoName);
@@ -349,51 +313,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
             }
 
-//            if (data.getData() != null) {
-//                Log.d("Image Taken", "Data exists");
-//
-//
-//
-//
-//
-//                ParcelFileDescriptor parcelFileDescriptor = null;
-//                try {
-//                    parcelFileDescriptor = this.getContentResolver().openFileDescriptor(data.getData(), "r");
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-//                Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-//                try {
-//                    parcelFileDescriptor.close();
-//
-//                } catch (IOException e) {
-//                    Log.d("Image Taken", e.toString());
-//                }
-//            } else {
-//                Log.d("Image Taken", "Data didn't exist");
-//                Bitmap imageRetrieved = (Bitmap) data.getExtras().get("data");
-//
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                imageRetrieved.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//                byte[] byteArray = stream.toByteArray();
-//                Log.d("Image Taken", byteArray.toString());
-//
-//                long id = db.insertPhotoLyrics("Temp Title", byteArray);
-//                if (id < 0)
-//                {
-//                    Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show();
-//                }
-//                else
-//                {
-//                    Toast.makeText(this, "success", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-
 
         }
     }
 
+    //Create Image file where the camera will output the photo taken by user
     private File createImageFile() throws IOException {
         // Create an image file name
 
@@ -410,22 +334,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
-    public boolean hasImageCaptureBug() {
 
-        // list of known devices that have the bug
-        ArrayList<String> devices = new ArrayList<String>();
-        devices.add("android-devphone1/dream_devphone/dream");
-        devices.add("generic/sdk/generic");
-        devices.add("vodafone/vfpioneer/sapphire");
-        devices.add("tmobile/kila/dream");
-        devices.add("verizon/voles/sholes");
-        devices.add("google_ion/google_ion/sapphire");
-
-        return devices.contains(android.os.Build.BRAND + "/" + android.os.Build.PRODUCT + "/"
-                + android.os.Build.DEVICE);
-
-    }
-
+    //Async take that loads lyrics
     private class loadLyrics extends AsyncTask<URL, Integer, ArrayList<Lyrics>> {
         protected ArrayList<Lyrics> doInBackground(URL... urls) {
             ArrayList<Lyrics> mArrayList = new ArrayList<>();
@@ -448,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     String lyrics = cursor.getString(index2);
                     int uid = cursor.getInt(index3);
                     String date = cursor.getString(index4);
-//                String s = uid+","+lyricTitle +"," + lyrics;
                     mArrayList.add(new Lyrics("TEXT", uid, lyricTitle,lyrics, date));
                     Log.d("Found Item In Database", lyricTitle + " " + date);
                     cursor.moveToNext();
@@ -470,8 +379,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     int uid = cursor.getInt(index3);
                     String date = cursor.getString(index4);
                     String filename = cursor.getString(index2);
-//                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
-//                mArrayList.add(s);
                     mArrayList.add(new Lyrics("IMAGE", uid, lyricTitle, filename, date));
                     Log.d("Found Item In Database", lyricTitle);
                     cursor.moveToNext();
@@ -493,8 +400,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     int uid = cursor.getInt(index3);
                     String date = cursor.getString(index4);
                     String filename = cursor.getString(index2);
-//                String s = uid+","+"IMAGE," + lyricTitle +"," + encoded;
-//                mArrayList.add(s);
                     mArrayList.add(new Lyrics("AUDIO", uid, lyricTitle, filename, date));
                     Log.d("Found Item In Database", lyricTitle);
                     cursor.moveToNext();
@@ -513,7 +418,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mRecyclerView = findViewById(R.id.LyricsRecyclerView);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.setAdapter(myAdapter);
         }

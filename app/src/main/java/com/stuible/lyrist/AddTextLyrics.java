@@ -17,6 +17,8 @@ public class AddTextLyrics extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_text_lyrics);
 
+//        getActionBar().setTitle("Add Lyrics");
+
         TitleEditText = (EditText)findViewById(R.id.TitleEditText);
         lyricsEditText = (EditText)findViewById(R.id.lyricsEditText);
 

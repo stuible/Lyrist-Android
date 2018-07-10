@@ -67,6 +67,64 @@ public class MyDatabase {
         return id;
     }
 
+    public void updateTitle(String title, String id){
+        db.execSQL("UPDATE " + Constants.LYRICS_TABLE_NAME + " SET " + Constants.TITLE +"='"+title +"' WHERE "+Constants.UID +"=" + id);
+
+    }
+    public Cursor getLyricsByID(String ID){
+        db = helper.getWritableDatabase();
+
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE, Constants.TEXT_LYRICS};
+
+
+
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.TEXT_LYRIC_TABLE_NAME + " text ON lyrics.lid=text.lid WHERE lyrics."
+                + Constants.UID + " = " + ID;
+
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
+    public Cursor getPhotoLyricsByID(String ID){
+        db = helper.getWritableDatabase();
+
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE};
+
+
+
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.PHOTO_LYRIC_TABLE_NAME + " photo ON lyrics.lid=photo.lid WHERE lyrics."
+                + Constants.UID + " = " + ID;
+
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
+    public Cursor getAudioLyricsByID(String ID){
+        db = helper.getWritableDatabase();
+
+        String[] columns = {"lyrics." + Constants.UID, Constants.TITLE, Constants.DATE};
+
+
+
+        String query = "SELECT " + TextUtils.join(", ", columns) + " FROM "
+                + Constants.LYRICS_TABLE_NAME + " lyrics INNER JOIN "
+                + Constants.AUDIO_LYRIC_TABLE_NAME + " audio ON lyrics.lid=audio.lid WHERE lyrics."
+                + Constants.UID + " = " + ID;
+
+
+        Log.d("query", query);
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
     public Cursor getLyrics()
     {
 //        context.deleteDatabase(DATABASE_NAME);

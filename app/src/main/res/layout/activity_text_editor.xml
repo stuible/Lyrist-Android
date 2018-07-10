@@ -6,4 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".TextEditor">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/titleTextEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="Title" />
+
+        <EditText
+            android:id="@+id/bodyTextEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:ems="10"
+            android:text="Body" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="saveButtonClick"
+            android:text="Save" />
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

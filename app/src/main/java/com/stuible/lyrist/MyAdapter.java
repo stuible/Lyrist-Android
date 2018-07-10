@@ -289,17 +289,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
                     if(result.type == "IMAGE"){
                         Intent myIntent = new Intent(context, PhotoEditor.class);
-                        myIntent.putExtra("ID", result.UID);
+                        myIntent.putExtra("ID", Integer.toString(result.UID));
                         context.startActivity(myIntent);
                     }
                     else if(result.type == "AUDIO"){
                         Intent myIntent = new Intent(context, AudioEditor.class);
-                        myIntent.putExtra("ID", result.UID);
+                        myIntent.putExtra("ID", Integer.toString(result.UID));
                         context.startActivity(myIntent);
                     }
                     else {
                         Intent myIntent = new Intent(context, TextEditor.class);
-                        myIntent.putExtra("ID", result.UID);
+                        myIntent.putExtra("ID", Integer.toString(result.UID));
                         context.startActivity(myIntent);
                     }
 
